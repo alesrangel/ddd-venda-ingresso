@@ -1,17 +1,17 @@
 import { randomUUID } from "node:crypto";
 import { AggregateRoot } from "../../../common/domain/aggregate-root";
-import { Name } from "../../../common/domain/value-objects/name.vo";
+import Cpf from "../../../common/domain/value-objects/cpf.vo";
 
 export type CustomerConstructorProps = {
     id?: string;
-    cpf: string;
-    name: Name;
+    cpf: Cpf;
+    name: string;
 };
 
 export class Customer extends AggregateRoot{
     id: string;
-    cpf: string;
-    name: Name;
+    cpf: Cpf;
+    name: string;
 
     constructor(props: CustomerConstructorProps){
         super();
@@ -20,8 +20,11 @@ export class Customer extends AggregateRoot{
         this.name = props.name;
     }
 
-    static create(command: {name: Name, cpf: string}){
-        return new Customer({id: randomUUID() ,...command});
+    static create(command: {name: string, cpf: string}){
+        return new Customer({id: randomUUID(),
+            name: this.name, 
+            cpf: new Cpf(command.cpf)
+        });
     }
 
     toJson(){
