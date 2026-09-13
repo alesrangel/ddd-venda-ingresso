@@ -1,37 +1,44 @@
-import { randomUUID } from "node:crypto";
-import { AggregateRoot } from "../../../common/domain/aggregate-root";
-import Cpf from "../../../common/domain/value-objects/cpf.vo";
+import { randomUUID } from 'node:crypto';
+import { AggregateRoot } from '../../../common/domain/aggregate-root';
+import Cpf from '../../../common/domain/value-objects/cpf.vo';
+import Uuid from '../../../common/domain/value-objects/uuid.vo';
+
+export class CustomerId extends Uuid {}
 
 export type CustomerConstructorProps = {
-    id?: string;
-    cpf: Cpf;
-    name: string;
+  id?: CustomerId | string;
+  cpf: Cpf;
+  name: string;
 };
 
-export class Customer extends AggregateRoot{
-    id: string;
-    cpf: Cpf;
-    name: string;
+export class Customer extends AggregateRoot {
+  id: CustomerId;
+  cpf: Cpf;
+  name: string;
 
-    constructor(props: CustomerConstructorProps){
-        super();
-        this.id = props.id ?? randomUUID();
-        this.cpf = props.cpf;
-        this.name = props.name;
-    }
+  constructor(props: CustomerConstructorProps) {
+    super();
+    this.id =
+      typeof props.id === 'string'
+        ? new CustomerId(props.id)
+        : (props.id ?? new CustomerId());
+    this.cpf = props.cpf;
+    this.name = props.name;
+  }
 
-    static create(command: {name: string, cpf: string}){
-        return new Customer({id: randomUUID(),
-            name: this.name, 
-            cpf: new Cpf(command.cpf)
-        });
-    }
+  static create(command: { name: string; cpf: string }) {
+    return new Customer({
+      id: randomUUID(),
+      name: this.name,
+      cpf: new Cpf(command.cpf),
+    });
+  }
 
-    toJson(){
-        return {
-            id: this.id,
-            cpf: this.cpf,
-            name: this.name,
-        };
-    }
+  toJson() {
+    return {
+      id: this.id,
+      cpf: this.cpf,
+      name: this.name,
+    };
+  }
 }
